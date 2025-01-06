@@ -9,6 +9,7 @@ export type ApiProvider =
 	| "gemini"
 	| "openai-native"
 	| "deepseek"
+	| "zhipu"
 
 export interface ApiHandlerOptions {
 	apiModelId?: string
@@ -35,6 +36,8 @@ export interface ApiHandlerOptions {
 	openAiNativeApiKey?: string
 	deepSeekApiKey?: string
 	azureApiVersion?: string
+	zhipuModelId?: string
+	zhipuApiKey?: string
 }
 
 export type ApiConfiguration = ApiHandlerOptions & {
@@ -365,4 +368,27 @@ export const deepSeekModels = {
 		cacheWritesPrice: 0.14,
 		cacheReadsPrice: 0.014,
 	},
+} as const satisfies Record<string, ModelInfo>
+
+// Zhipu
+// https://open.bigmodel.cn/dev/api
+export type ZhipuModelId = keyof typeof zhipuModels
+export const zhipuDefaultModelId: ZhipuModelId = "glm-zero-preview"
+export const zhipuModels = {
+	"glm-zero-preview": {
+		maxTokens: 8_192,
+		contextWindow: 128_000,
+		supportsImages: true,
+		supportsPromptCache: false,
+		inputPrice: 0.01,
+		outputPrice: 0.02,
+	},
+	// "glm-3-turbo": {
+	// 	maxTokens: 4_096,
+	// 	contextWindow: 128_000,
+	// 	supportsImages: false,
+	// 	supportsPromptCache: false,
+	// 	inputPrice: 0.005,
+	// 	outputPrice: 0.01,
+	// },
 } as const satisfies Record<string, ModelInfo>

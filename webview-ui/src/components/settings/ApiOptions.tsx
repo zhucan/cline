@@ -138,6 +138,7 @@ const ApiOptions = ({ showModelOptions, apiErrorMessage, modelIdErrorMessage }: 
 					<VSCodeOption value="openai">OpenAI Compatible</VSCodeOption>
 					<VSCodeOption value="lmstudio">LM Studio</VSCodeOption>
 					<VSCodeOption value="ollama">Ollama</VSCodeOption>
+					<VSCodeOption value="zhipu">Zhipu</VSCodeOption>
 				</VSCodeDropdown>
 			</div>
 
@@ -635,6 +636,34 @@ const ApiOptions = ({ showModelOptions, apiErrorMessage, modelIdErrorMessage }: 
 				</div>
 			)}
 
+			{selectedProvider === "zhipu" && (
+				<div>
+					<VSCodeTextField
+						value={apiConfiguration?.zhipuApiKey || ""}
+						style={{ width: "100%" }}
+						type="password"
+						onInput={handleInputChange("zhipuApiKey")}
+						placeholder="Enter API Key...">
+						<span style={{ fontWeight: 500 }}>Zhipu API Key</span>
+					</VSCodeTextField>
+					<p
+						style={{
+							fontSize: "12px",
+							marginTop: 3,
+							color: "var(--vscode-descriptionForeground)",
+						}}>
+						This key is stored locally and only used to make API requests from this extension.
+						{!apiConfiguration?.zhipuApiKey && (
+							<VSCodeLink
+								href="https://open.bigmodel.cn/usercenter/apikeys"
+								style={{ display: "inline", fontSize: "inherit" }}>
+								You can get a Zhipu API key by signing up here.
+							</VSCodeLink>
+						)}
+					</p>
+				</div>
+			)}
+
 			{apiErrorMessage && (
 				<p
 					style={{
@@ -874,6 +903,12 @@ export function normalizeApiConfiguration(apiConfiguration?: ApiConfiguration) {
 			return {
 				selectedProvider: provider,
 				selectedModelId: apiConfiguration?.lmStudioModelId || "",
+				selectedModelInfo: openAiModelInfoSaneDefaults,
+			}
+		case "zhipu":
+			return {
+				selectedProvider: provider,
+				selectedModelId: apiConfiguration?.zhipuModelId || "",
 				selectedModelInfo: openAiModelInfoSaneDefaults,
 			}
 		default:

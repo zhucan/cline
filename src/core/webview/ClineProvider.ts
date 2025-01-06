@@ -40,6 +40,7 @@ type SecretKey =
 	| "geminiApiKey"
 	| "openAiNativeApiKey"
 	| "deepSeekApiKey"
+	| "zhipuApiKey"
 type GlobalStateKey =
 	| "apiProvider"
 	| "apiModelId"
@@ -61,6 +62,7 @@ type GlobalStateKey =
 	| "openRouterModelId"
 	| "openRouterModelInfo"
 	| "autoApprovalSettings"
+	| "zhipuModelId"
 
 export const GlobalFileNames = {
 	apiConversationHistory: "api_conversation_history.json",
@@ -380,6 +382,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 								geminiApiKey,
 								openAiNativeApiKey,
 								deepSeekApiKey,
+								zhipuApiKey,
+								zhipuModelId,
 								azureApiVersion,
 								openRouterModelId,
 								openRouterModelInfo,
@@ -409,6 +413,9 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 							await this.updateGlobalState("azureApiVersion", azureApiVersion)
 							await this.updateGlobalState("openRouterModelId", openRouterModelId)
 							await this.updateGlobalState("openRouterModelInfo", openRouterModelInfo)
+							await this.storeSecret("zhipuApiKey", zhipuApiKey)
+							await this.updateGlobalState("zhipuModelId", zhipuModelId)
+
 							if (this.cline) {
 								this.cline.api = buildApiHandler(message.apiConfiguration)
 							}
@@ -733,6 +740,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 							modelInfo.cacheWritesPrice = 0.14
 							modelInfo.cacheReadsPrice = 0.014
 							break
+						case "zhipu/glm-4":
+							break
 					}
 
 					models[rawModel.id] = modelInfo
@@ -934,6 +943,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			customInstructions,
 			taskHistory,
 			autoApprovalSettings,
+			zhipuApiKey,
+			zhipuModelId,
 		] = await Promise.all([
 			this.getGlobalState("apiProvider") as Promise<ApiProvider | undefined>,
 			this.getGlobalState("apiModelId") as Promise<string | undefined>,
@@ -964,6 +975,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			this.getGlobalState("customInstructions") as Promise<string | undefined>,
 			this.getGlobalState("taskHistory") as Promise<HistoryItem[] | undefined>,
 			this.getGlobalState("autoApprovalSettings") as Promise<AutoApprovalSettings | undefined>,
+			this.getSecret("zhipuApiKey") as Promise<string | undefined>,
+			this.getGlobalState("zhipuModelId") as Promise<string | undefined>,
 		])
 
 		let apiProvider: ApiProvider
@@ -1007,6 +1020,8 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 				azureApiVersion,
 				openRouterModelId,
 				openRouterModelInfo,
+				zhipuApiKey,
+				zhipuModelId,
 			},
 			lastShownAnnouncementId,
 			customInstructions,
@@ -1088,6 +1103,7 @@ export class ClineProvider implements vscode.WebviewViewProvider {
 			"geminiApiKey",
 			"openAiNativeApiKey",
 			"deepSeekApiKey",
+			"zhipuApiKey",
 		]
 		for (const key of secretKeys) {
 			await this.storeSecret(key, undefined)
